@@ -1,0 +1,1721 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Timer Pomodoro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marmelad&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+	
+	:root,
+	.theme-1 {
+	    --bg-gradient: linear-gradient(135deg, #F5F5F5, #f5ebeb, #fff0f0);
+	    --pomodoro-color: #ffb3b3;
+	    --short-color: #9ee0dc;
+    	    --long-color: #8ed2e1;
+	    --card-bg: rgba(255, 255, 255, 0.95);
+	    --sidebar-bg: rgba(255, 255, 255, 0.9);
+	    --text-primary: #2d3436;
+	    --text-secondary: #636e72;
+	    --border-color: #e9ecef;
+	    --hover-color: #f1f3f5;
+	}
+
+	.theme-2 {
+	    --bg-gradient: linear-gradient(135deg, #f3e8ff, #ede7f6, #f5edff);
+	    --pomodoro-color: #b39ddb;
+	    --short-color: #a888c4;
+	    --long-color: #c4a8d4;
+	    --card-bg: rgba(255, 255, 255, 0.95);
+ 	    --sidebar-bg: rgba(255, 255, 255, 0.9);
+	    --text-primary: #4a3b6e;
+	    --text-secondary: #735f9e;
+	    --border-color: #e0d4f0;
+	    --hover-color: #f3edff;
+	}
+	
+	.theme-3 {
+	    --bg-gradient: linear-gradient(135deg, #e8f5e9, #e0f2f1, #f1f8e9);
+	    --pomodoro-color: #66bbaa;
+	    --short-color: #81c784;
+	    --long-color: #a5d6a7;
+	    --card-bg: rgba(255, 255, 255, 0.95);
+	    --sidebar-bg: rgba(255, 255, 255, 0.9);
+	    --text-primary: #2c5a4a;
+	    --text-secondary: #5c8a7a;
+	    --border-color: #c8e6e0;
+	    --hover-color: #e8f5f2;
+	}
+
+	.theme-4 {
+	    --bg-gradient: linear-gradient(135deg, #faf4ea, #f5ede3, #fff5eb);
+	    --pomodoro-color: #c87a4a;
+	    --short-color: #b8a99a;
+	    --long-color: #d4b8a0;
+	    --card-bg: rgba(255, 255, 255, 0.95);
+	    --sidebar-bg: rgba(255, 255, 255, 0.9);
+	    --text-primary: #5d4037;
+	    --text-secondary: #8d6e63;
+	    --border-color: #e6d5c0;
+	    --hover-color: #faefe6;
+	}
+	        
+	body {
+            font-family: 'Marmelad', 'Segoe UI', system-ui, -apple-system, sans-serif;
+	    h1, h2, h3, .title, .todo-title {
+    		font-family: 'Segoe UI', cursive;
+	    }
+	    .timer-display, #minutes, #seconds {
+    		font-family: 'Marmelad', monospace;
+    		font-weight: 700;
+	    }
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            padding: 20px;
+        }
+
+	.theme-toggle {
+	    width: 100%;
+	    margin-top: 15px;
+	    background: var(--border-color);
+	    color: var(--text-primary);
+	    border: none;
+	    padding: 10px;
+	    border-radius: 15px;
+	    font-size: 0.9rem;
+	    font-weight: 600;
+	    cursor: pointer;
+	    transition: all 0.3s;
+	}
+
+	.theme-toggle:hover {
+	    background: var(--pomodoro-color);
+	    color: white;
+	    transform: translateY(-2px);
+	}
+
+
+        /* Боковое меню */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px;
+            margin-right: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-section {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-gradient);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .login-btn {
+            background: var(--pomodoro-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .login-form {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--pomodoro-color);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .form-btn.save {
+            background: var(--pomodoro-color);
+            color: white;
+        }
+
+        .form-btn.cancel {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            background: var(--border-color);
+            color: var(--text-secondary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        .logout-btn.active {
+            display: block;
+        }
+
+        /* Панель звуков */
+        .sounds-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px 0;
+            user-select: none;
+        }
+
+        .panel-header:hover {
+            opacity: 0.8;
+        }
+
+        .panel-icon {
+            font-size: 1.2rem;
+        }
+
+        .panel-title {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .panel-arrow {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+
+        .panel-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .sounds-content {
+            margin-top: 15px;
+            display: grid;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .sounds-content.hidden {
+            display: none;
+        }
+
+        .sound-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-align: left;
+        }
+
+        .sound-card:hover {
+            transform: translateX(5px);
+            border-color: var(--pomodoro-color);
+        }
+
+        .sound-card.playing {
+            border-color: var(--pomodoro-color);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .sound-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sound-name span {
+            display: inline-block;
+            width: 24px;
+            text-align: center;
+	    color: #2d3436;
+        }
+
+        .sound-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+	.mirror-emoji {
+    	    display: inline-block;
+    	    transform: scaleX(-1);
+	}
+
+	.mirror-sound {
+    	    display: inline-block;
+    	    transform: scaleX(-1);
+	}
+
+        /* Панель видео */
+        .videos-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .videos-content {
+            margin-top: 15px;
+            display: grid;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .videos-content.hidden {
+            display: none;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .video-card:hover {
+            transform: translateX(5px);
+            border-color: var(--pomodoro-color);
+        }
+
+        .video-card.active {
+            border-color: var(--pomodoro-color);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .video-thumbnail {
+            width: 60px;
+            height: 40px;
+            background: var(--bg-gradient);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .video-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+	.video-showcase {
+    	    width: 100%;
+    	    margin-top: 30px;
+    	    border-radius: 20px;
+    	    overflow: hidden;
+    	    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    	    background: #000;
+    	    position: relative;
+    	    aspect-ratio: 16 / 9; /* Соотношение сторон как у YouTube */
+	}
+
+	.video-showcase video {
+    	    width: 100%;
+    	    height: 100%;
+    	    object-fit: cover;
+ 	    display: block;
+	}
+
+	.video-label {
+	    position: absolute;
+	    bottom: 20px;
+	    left: 20px;
+	    background: rgba(0, 0, 0, 0.7);
+	    color: white;
+	    padding: 8px 20px;
+	    border-radius: 30px;
+	    font-size: 1rem;
+	    backdrop-filter: blur(5px);
+	    font-weight: 500;
+	    letter-spacing: 0.5px;
+	}
+
+	.video-controls-mini {
+	    position: absolute;
+	    bottom: 20px;
+	    right: 20px;
+	    display: flex;
+	    gap: 12px;
+	}
+
+	.video-control-mini {
+	    background: rgba(0, 0, 0, 0.7);
+	    border: none;
+	    color: white;
+	    width: 44px;
+	    height: 44px;
+	    border-radius: 50%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    cursor: pointer;
+	    backdrop-filter: blur(5px);
+	    transition: all 0.3s;
+	    font-size: 1.2rem;
+	    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	.video-control-mini:hover {
+	    background: var(--pomodoro-color);
+	    transform: scale(1.1);
+	}
+
+        .main-content {
+            flex: 1;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            margin-top: 50px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+        }
+
+        /* Левая колонка - Таймер */
+        .timer-section {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        .mode-switcher {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--border-color);
+            padding: 5px;
+            border-radius: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: white;
+            color: var(--pomodoro-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn[data-mode="short"].active {
+            color: var(--short-color);
+        }
+
+        .mode-btn[data-mode="long"].active {
+            color: var(--long-color);
+        }
+
+        .timer-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: #f0f0f0;
+            stroke-width: 6;
+        }
+
+        .progress-fill {
+            fill: none;
+            stroke: var(--pomodoro-color);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 283;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Marmelad', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--pomodoro-color);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .control-btn.secondary {
+            background: var(--border-color);
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .active-task {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .active-task-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .active-task-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Правая колонка - Список задач */
+        .todo-section {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        .todo-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .todo-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .todo-input:focus {
+            outline: none;
+            border-color: var(--pomodoro-color);
+        }
+
+        .todo-add-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            background: var(--pomodoro-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .todo-add-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .todo-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--pomodoro-color);
+            color: white;
+        }
+
+        .todo-list {
+            list-style: none;
+            margin-bottom: 20px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .todo-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--pomodoro-color);
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .todo-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: none;
+            color: var(--text-secondary);
+        }
+
+        .todo-btn:hover {
+            background: var(--pomodoro-color);
+            color: white;
+        }
+
+        .todo-btn.note-btn {
+            background: none;
+            color: var(--text-secondary);
+        }
+
+        .todo-btn.note-btn:hover {
+            background: #45b7d1;
+            color: white;
+        }
+
+        .todo-text-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .todo-note {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        .todo-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        #tasks-left {
+            font-weight: 700;
+            color: var(--pomodoro-color);
+            font-size: 1.2rem;
+        }
+
+        .clear-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+
+            .main-content {
+                width: 100%;
+                padding: 15px;
+                margin: 0;
+            }
+
+            .app {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                width: 100%;
+            }
+
+            .timer-section,
+            .todo-section {
+                width: 100%;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .timer-container {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto 20px;
+            }
+
+            .timer-display {
+                font-size: 2.2rem;
+            }
+
+            .control-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .title {
+                font-size: 1.8rem;
+                margin-top: 20px;
+                margin-bottom: 1rem;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 1.5rem;
+                padding: 0 10px;
+            }
+
+            .mode-btn {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .todo-input-group {
+                flex-direction: column;
+            }
+
+            .todo-add-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .sound-card, .video-card {
+                padding: 10px;
+            }
+
+            .todo-footer {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .sounds-panel,
+            .videos-panel {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Боковое меню -->
+    <div class="sidebar">
+        <!-- Блок пользователя -->
+        <div class="user-section">
+            <div class="user-avatar" id="userAvatar">👤</div>
+            <div class="user-name" id="userName">Гость</div>
+            <div class="user-email" id="userEmail">не зарегистрирован</div>
+            
+            <button class="login-btn" id="showLoginBtn">Войти / Регистрация</button>
+            <button class="logout-btn" id="logoutBtn">Выйти</button>
+            
+            <div class="login-form" id="loginForm">
+                <input type="text" class="form-input" id="regName" placeholder="Имя">
+                <input type="email" class="form-input" id="regEmail" placeholder="Email">
+                <div class="form-buttons">
+                    <button class="form-btn save" id="saveUserBtn">Сохранить</button>
+                    <button class="form-btn cancel" id="cancelLoginBtn">Отмена</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель звуков -->
+        <div class="sounds-panel">
+            <div class="panel-header" id="soundsToggle">
+                <span class="panel-icon"></span>
+                <span class="panel-title">Фоновые звуки</span>
+                <span class="panel-arrow">▼</span>
+            </div>
+            
+            <div class="sounds-content hidden" id="soundsContent">
+                <!-- Звуки будут добавлены через JS -->
+            </div>
+        </div>
+        
+        <!-- Панель видео -->
+        <div class="videos-panel">
+            <div class="panel-header" id="videosToggle">
+                <span class="panel-icon"></span>
+                <span class="panel-title">Фоновые видео</span>
+                <span class="panel-arrow">▼</span>
+            </div>
+            
+            <div class="videos-content hidden" id="videosContent">
+
+            </div>
+        </div>
+
+	<button class="theme-toggle" id="themeToggle">Сменить тему</button>
+
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+        <h1 class="title">Tomodoro Timer</h1>
+        <p class="subtitle">Выбери время работы и отдыха, добавь задачи, которые нужно сделать, и включи 	фоновые звуки или видео, чтобы легче было сосредоточиться.</p>
+
+        <div class="app">
+            <!-- Левая колонка - Таймер -->
+            <div class="timer-section">
+                <div class="mode-switcher">
+                    <button class="mode-btn active" data-mode="pomodoro">Помидор</button>
+                    <button class="mode-btn" data-mode="short">Перерыв</button>
+                    <button class="mode-btn" data-mode="long">Отдых</button>
+                </div>
+
+                <div class="timer-container">
+                    <svg class="timer-progress" viewBox="0 0 100 100">
+                        <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-fill" cx="50" cy="50" r="45" style="stroke-dasharray: 283; stroke-dashoffset: 0;"></circle>
+                    </svg>
+                    <div class="timer-display">
+                        <span id="minutes">25</span>:<span id="seconds">00</span>
+                    </div>
+                </div>
+
+                <div class="timer-controls">
+                    <button class="control-btn" id="start-btn">▶ Старт</button>
+                    <button class="control-btn" id="pause-btn" style="display: none;">Пауза</button>
+                    <button class="control-btn secondary" id="reset-btn">↺ Сброс</button>
+                </div>
+
+                <div class="active-task">
+                    <span class="active-task-label">Сейчас делаем:</span>
+                    <span class="active-task-text" id="current-task">—</span>
+                </div>
+            </div>
+
+            <!-- Правая колонка - Список задач -->
+            <div class="todo-section">
+                <h2 class="todo-title">Мои задачи</h2>
+                
+                <div class="todo-input-group">
+                    <input type="text" id="task-input" placeholder="Что нужно сделать?" class="todo-input">
+                    <button id="add-task-btn" class="todo-add-btn">+ Добавить</button>
+                </div>
+
+                <div class="todo-filters">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="active">Активные</button>
+                    <button class="filter-btn" data-filter="completed">Выполненные</button>
+                </div>
+
+                <ul class="todo-list" id="todo-list"></ul>
+
+                <div class="todo-footer">
+                    <span id="tasks-left">0</span> задач осталось
+                    <button class="clear-btn" id="clear-completed">Очистить выполненные</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок для видео -->
+        <div class="video-showcase" id="videoShowcase" style="display: none;">
+            <video id="mainVideo" loop muted></video>
+            <div class="video-label" id="videoLabel"></div>
+            <div class="video-controls-mini">
+                <button class="video-control-mini" id="miniVideoMute" title="Выключить звук">🔇</button>
+                <button class="video-control-mini" id="miniVideoClose" title="Закрыть видео">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log;
+            
+            // ============ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ПАНЕЛЯМИ ============
+            const soundsToggle = document.getElementById('soundsToggle');
+            const soundsContent = document.getElementById('soundsContent');
+            
+            if (soundsToggle) {
+                soundsToggle.addEventListener('click', function() {
+                    if (soundsContent) soundsContent.classList.toggle('hidden');
+                    const arrow = this.querySelector('.panel-arrow');
+                    if (arrow) arrow.classList.toggle('open');
+                });
+            }
+
+            const videosToggle = document.getElementById('videosToggle');
+            const videosContent = document.getElementById('videosContent');
+            
+            if (videosToggle) {
+                videosToggle.addEventListener('click', function() {
+                    if (videosContent) videosContent.classList.toggle('hidden');
+                    const arrow = this.querySelector('.panel-arrow');
+                    if (arrow) arrow.classList.toggle('open');
+                });
+            }
+
+            // ============ ПЛЕЕР ============
+            const sounds = [
+                { name: 'Дождь', url: 'sounds/rain.mp3' },
+                { name: 'Океан', url: 'sounds/ocean.mp3' },
+                { name: 'Лес', url: 'sounds/forest.mp3' },
+                { name: 'Костер', url: 'sounds/fire.mp3' },
+                { name: 'Птицы', url: 'sounds/birds.mp3' },
+             	{ name: 'Белый шум', url: 'sounds/white-noise.mp3' }
+            ];
+
+            const audioPlayers = {};
+            let currentlyPlaying = null;
+            
+            sounds.forEach(sound => {
+                const audio = new Audio();
+                audio.src = sound.url;
+                audio.loop = true;
+                audio.volume = 0.8;
+                audioPlayers[sound.name] = audio;
+            });
+
+            if (soundsContent) {
+                soundsContent.innerHTML = '';
+                
+                sounds.forEach(sound => {
+                    const card = document.createElement('div');
+                    card.className = 'sound-card';
+                    card.dataset.sound = sound.name;
+                    
+                    card.innerHTML = `
+                        <div class="sound-name">
+                            <span id="status-${sound.name}">▶︎</span>
+                            ${sound.name}
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', function() {
+                        const audio = audioPlayers[sound.name];
+                        const statusEl = document.getElementById(`status-${sound.name}`);
+                        
+                        if (currentlyPlaying === sound.name) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                            this.classList.remove('playing');
+                            statusEl.textContent = '▶︎';
+                            currentlyPlaying = null;
+                        } else {
+                            if (currentlyPlaying) {
+                                const prevAudio = audioPlayers[currentlyPlaying];
+                                prevAudio.pause();
+                                prevAudio.currentTime = 0;
+                                const prevCard = document.querySelector(`[data-sound="${currentlyPlaying}"]`);
+                                if (prevCard) prevCard.classList.remove('playing');
+                                const prevStatus = document.getElementById(`status-${currentlyPlaying}`);
+                                if (prevStatus) prevStatus.textContent = '▶︎';
+                            }
+                            
+                            audio.play()
+                                .then(() => {
+                                    this.classList.add('playing');
+				    statusEl.textContent = ''; // очищаем
+                                    statusEl.innerHTML = '<span class="mirror-emoji">🕪</span>';
+                                    currentlyPlaying = sound.name;
+                                })
+                                .catch(() => {
+                                    statusEl.textContent = '❌';
+                                });
+                        }
+                    });
+                    
+                    soundsContent.appendChild(card);
+                });
+            }
+
+            // ============ ВИДЕО ============
+            const videos = [
+                { name: 'version 1', file: 'study-with-me.mp4' },
+                { name: 'version 2', file: 'study-with-me2.mp4' },
+                { name: 'version 3', file: 'study-with-me3.mp4' },
+                { name: 'version 4', file: 'study-with-me4.mp4' }
+            ];
+
+            let currentVideo = null;
+            const videoShowcase = document.getElementById('videoShowcase');
+            const mainVideo = document.getElementById('mainVideo');
+            const videoLabel = document.getElementById('videoLabel');
+            
+            // Отрисовка карточек видео
+            if (videosContent) {
+                videosContent.innerHTML = '';
+                
+                videos.forEach(video => {
+                    const card = document.createElement('div');
+                    card.className = 'video-card';
+                    card.dataset.video = video.file;
+                    
+                    card.innerHTML = `
+                        <div class="video-info">
+                            <div class="video-name">${video.name}</div>
+                            <div class="video-status" id="video-status-${video.file}">▶︎</div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', function() {
+                        const statusEl = document.getElementById(`video-status-${video.file}`);
+                        
+                        if (currentVideo === video.file) {
+                            // Выключаем видео
+                            videoShowcase.style.display = 'none';
+                            mainVideo.pause();
+                            mainVideo.src = '';
+                            currentVideo = null;
+                            document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+                            document.querySelectorAll('[id^="video-status-"]').forEach(el => el.textContent = '▶︎');
+                        } else {
+                            // Убираем активный класс с других карточек
+                            document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+                            
+                            // Устанавливаем новое видео
+                            mainVideo.src = `videos/${video.file}`;
+                            mainVideo.play();
+                            videoLabel.textContent = video.name;
+                            videoShowcase.style.display = 'block';
+                            
+                            // Обновляем статусы
+                            document.querySelectorAll('[id^="video-status-"]').forEach(el => el.textContent = '▶︎');
+                            statusEl.textContent = '❚❚';
+                            
+                            this.classList.add('active');
+                            currentVideo = video.file;
+                        }
+                    });
+                    
+                    videosContent.appendChild(card);
+                });
+            }
+
+            // Управление видео
+            document.getElementById('miniVideoMute').addEventListener('click', function() {
+                if (mainVideo) {
+                    mainVideo.muted = !mainVideo.muted;
+                    this.textContent = mainVideo.muted ? '🔇' : '🕪';
+	            // Применяем зеркало только если иконка 🕪
+	            if (!mainVideo.muted) {
+	                this.style.transform = 'scaleX(-1)';
+	                this.style.display = 'inline-block';
+	            } 
+		    else {
+	                this.style.transform = 'none';
+	            }
+	        }
+	    });
+
+            document.getElementById('miniVideoClose').addEventListener('click', function() {
+                videoShowcase.style.display = 'none';
+                mainVideo.pause();
+                mainVideo.src = '';
+                currentVideo = null;
+                document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('[id^="video-status-"]').forEach(el => el.textContent = '▶︎');
+            });
+
+            // ============ РЕГИСТРАЦИЯ ============
+            const showLoginBtn = document.getElementById('showLoginBtn');
+            const loginForm = document.getElementById('loginForm');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+            const cancelLoginBtn = document.getElementById('cancelLoginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userAvatar = document.getElementById('userAvatar');
+
+            function loadUser() {
+                const savedUser = localStorage.getItem('user');
+                if (savedUser) {
+                    const user = JSON.parse(savedUser);
+                    userName.textContent = user.name;
+                    userEmail.textContent = user.email;
+                    userAvatar.textContent = user.name.charAt(0).toUpperCase();
+                    showLoginBtn.style.display = 'none';
+                    logoutBtn.classList.add('active');
+                }
+            }
+
+            if (showLoginBtn) {
+                showLoginBtn.addEventListener('click', function() {
+                    loginForm.classList.add('active');
+                    showLoginBtn.style.display = 'none';
+                });
+            }
+
+            if (cancelLoginBtn) {
+                cancelLoginBtn.addEventListener('click', function() {
+                    loginForm.classList.remove('active');
+                    showLoginBtn.style.display = 'block';
+                });
+            }
+
+            if (saveUserBtn) {
+                saveUserBtn.addEventListener('click', function() {
+                    const name = document.getElementById('regName').value.trim();
+                    const email = document.getElementById('regEmail').value.trim();
+                    
+                    if (name && email) {
+                        const user = { name, email };
+                        localStorage.setItem('user', JSON.stringify(user));
+                        
+                        userName.textContent = name;
+                        userEmail.textContent = email;
+                        userAvatar.textContent = name.charAt(0).toUpperCase();
+                        
+                        loginForm.classList.remove('active');
+                        showLoginBtn.style.display = 'none';
+                        logoutBtn.classList.add('active');
+                        
+                        document.getElementById('regName').value = '';
+                        document.getElementById('regEmail').value = '';
+                    } else {
+                        alert('Пожалуйста, заполните все поля');
+                    }
+                });
+            }
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('user');
+                    userName.textContent = 'Гость';
+                    userEmail.textContent = 'не зарегистрирован';
+                    userAvatar.textContent = '👤';
+                    showLoginBtn.style.display = 'block';
+                    logoutBtn.classList.remove('active');
+                });
+            }
+
+            loadUser();
+
+            // ============ ТАЙМЕР ============
+            const minutesSpan = document.getElementById('minutes');
+            const secondsSpan = document.getElementById('seconds');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const modeBtns = document.querySelectorAll('.mode-btn');
+            const progressFill = document.querySelector('.progress-fill');
+            const currentTaskSpan = document.getElementById('current-task');
+            
+            const TIMES = {
+                pomodoro: 25 * 60,
+                short: 5 * 60,
+                long: 15 * 60
+            };
+            
+            let currentMode = 'pomodoro';
+            let timeLeft = TIMES.pomodoro;
+            let isRunning = false;
+	    let soundPlayed = false;
+            let timerInterval = null;
+            let completedPomodoros = 0;
+            
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                minutesSpan.textContent = minutes.toString().padStart(2, '0');
+                secondsSpan.textContent = seconds.toString().padStart(2, '0');
+                
+                const totalTime = TIMES[currentMode];
+                const progress = (timeLeft / totalTime) * 283;
+                progressFill.style.strokeDashoffset = 283 - progress;
+            }
+            
+            function startTimer() {
+                if (isRunning) return;
+                
+                isRunning = true;
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+                
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft === 3 && !soundPlayed) {
+		        soundPlayed = true;
+		        const audio = new Audio('sounds/timer-end.mp3'); 
+		        audio.volume = 0.9;
+		        audio.play();
+		    }
+		
+		    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        startBtn.style.display = 'inline-block';
+                        pauseBtn.style.display = 'none';
+                        
+                        if (currentMode === 'pomodoro') {
+                            completedPomodoros++;
+                            if (completedPomodoros % 4 === 0) {
+                                switchMode('long');
+                            } else {
+                                switchMode('short');
+                            }
+                        } else {
+                            switchMode('pomodoro');
+                        }
+                    }
+                }, 1000);
+            }
+            
+            function pauseTimer() {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+            }
+            
+            function resetTimer() {
+		soundPlayed = false;
+                pauseTimer();
+                timeLeft = TIMES[currentMode];
+                updateTimerDisplay();
+            }
+            
+            function switchMode(mode) {
+		soundPlayed = false;
+                currentMode = mode;
+                timeLeft = TIMES[mode];
+                
+                modeBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.mode === mode) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+	        if (mode === 'pomodoro') {
+	            progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--pomodoro-color').trim();
+	        } else if (mode === 'short') {
+	            progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--short-color').trim();
+	        } else {
+	            progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--long-color').trim();
+	        }
+                
+                resetTimer();
+            }
+            
+            // ============ ЗАДАЧИ ============
+            const taskInput = document.getElementById('task-input');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const todoList = document.getElementById('todo-list');
+            const tasksLeftSpan = document.getElementById('tasks-left');
+            const clearCompletedBtn = document.getElementById('clear-completed');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            let tasks = [];
+            let currentFilter = 'all';
+            let activeTaskId = null;
+            
+            function loadTasks() {
+                const saved = localStorage.getItem('pomodoro-tasks');
+                if (saved) {
+                    tasks = JSON.parse(saved);
+                    renderTasks();
+                }
+            }
+            
+            function saveTasks() {
+                localStorage.setItem('pomodoro-tasks', JSON.stringify(tasks));
+            }
+            
+	    function addTask() {
+    	    	const text = taskInput.value.trim();
+    		if (text) {
+        	    tasks.push({
+            		id: Date.now(),
+            		text: text,
+            		note: null,
+            		completed: false,
+           		createdAt: new Date().toISOString()
+      	 	    });
+     		    taskInput.value = '';
+       		    saveTasks();
+    		    renderTasks();
+    		}
+	    }	
+            
+            function toggleTask(id) {
+                tasks = tasks.map(task => {
+                    if (task.id === id) {
+                        return { ...task, completed: !task.completed };
+                    }
+                    return task;
+                });
+                saveTasks();
+                renderTasks();
+            }
+            
+            function deleteTask(id) {
+                tasks = tasks.filter(task => task.id !== id);
+                if (activeTaskId === id) {
+                    activeTaskId = null;
+                    currentTaskSpan.textContent = '—';
+                }
+                saveTasks();
+                renderTasks();
+            }
+            
+            function setActiveTask(id, text) {
+                activeTaskId = id;
+                currentTaskSpan.textContent = text;
+            }
+            
+            function clearCompleted() {
+                tasks = tasks.filter(task => !task.completed);
+                saveTasks();
+                renderTasks();
+            }
+            
+            function getFilteredTasks() {
+                if (currentFilter === 'active') {
+                    return tasks.filter(task => !task.completed);
+                } else if (currentFilter === 'completed') {
+                    return tasks.filter(task => task.completed);
+                }
+                return tasks;
+            }
+            
+            function countActiveTasks() {
+                return tasks.filter(task => !task.completed).length;
+            }
+            
+	    function renderTasks() {
+	        const filteredTasks = getFilteredTasks();
+    		const activeCount = countActiveTasks();
+    
+    		todoList.innerHTML = '';
+    
+    		filteredTasks.forEach(task => {
+        	    const li = document.createElement('li');
+        	    li.className = 'todo-item';
+        	    li.dataset.id = task.id;
+        
+        	    // Чекбокс
+        	    const checkbox = document.createElement('input');
+        	    checkbox.type = 'checkbox';
+        	    checkbox.className = 'todo-checkbox';
+        	    checkbox.checked = task.completed;
+        
+	            // Контейнер для текста задачи и заметки
+        	    const textContainer = document.createElement('div');
+        	    textContainer.className = 'todo-text-container';
+        
+        	    const textSpan = document.createElement('span');
+        	    textSpan.className = 'todo-text' + (task.completed ? ' completed' : '');
+        	    textSpan.textContent = task.text;
+        
+        	    // Отображение заметки (если есть)
+        	    let noteSpan = null;
+            	    if (task.note && task.note.trim() !== '') {
+            		noteSpan = document.createElement('div');
+            		noteSpan.className = 'todo-note';
+            		noteSpan.textContent = '📝 ' + (task.note.length > 50 ? task.note.substring(0, 50) + '...' : task.note);
+        	    }
+        
+	    	    textContainer.appendChild(textSpan);
+     		    if (noteSpan) textContainer.appendChild(noteSpan);
+        
+     		    // Кнопки действий
+   		    const actionsDiv = document.createElement('div');
+     		    actionsDiv.className = 'todo-actions';
+        
+    		    const useBtn = document.createElement('button');
+    		    useBtn.className = 'todo-btn use-btn';
+    		    useBtn.textContent = '▶';
+    		    useBtn.title = 'Работаем над этой задачей';
+        
+    		    const noteBtn = document.createElement('button');
+   	  	    noteBtn.className = 'todo-btn note-btn';
+    		    noteBtn.textContent = '📝';
+    		    noteBtn.title = task.note ? 'Редактировать заметку' : 'Добавить заметку';
+        
+     		    const deleteBtn = document.createElement('button');
+     		    deleteBtn.className = 'todo-btn delete-btn';
+     		    deleteBtn.textContent = '✕';
+    		    deleteBtn.title = 'Удалить';
+        
+     		    actionsDiv.appendChild(useBtn);
+      		    actionsDiv.appendChild(noteBtn);
+    		    actionsDiv.appendChild(deleteBtn);
+        
+     		    li.appendChild(checkbox);
+     		    li.appendChild(textContainer);
+    		    li.appendChild(actionsDiv);
+        
+    		    // Обработчики
+    		    checkbox.addEventListener('change', () => toggleTask(task.id));
+    		    useBtn.addEventListener('click', () => setActiveTask(task.id, task.text));
+        
+    		    noteBtn.addEventListener('click', function(e) {
+            		e.stopPropagation();
+            		const newNote = prompt('Добавьте заметку к задаче:', task.note || '');
+            		if (newNote !== null) {
+           		    task.note = newNote;
+             		    saveTasks();
+             		    renderTasks();
+            		}
+  	            });
+        
+        	    deleteBtn.addEventListener('click', () => deleteTask(task.id));
+        
+        	    todoList.appendChild(li);
+    		});
+    
+    		tasksLeftSpan.textContent = activeCount;
+	    }
+
+            // ============ ОБРАБОТЧИКИ СОБЫТИЙ ============
+            
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            
+            modeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchMode(this.dataset.mode);
+                });
+            });
+            
+            addTaskBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderTasks();
+                });
+            });
+            
+            clearCompletedBtn.addEventListener('click', clearCompleted);
+            
+            loadTasks();
+            updateTimerDisplay();
+
+
+            // ============ ПЕРЕКЛЮЧЕНИЕ ТЕМ ============
+            const themeToggle = document.getElementById('themeToggle');
+            
+            // Список доступных тем
+            const themes = ['theme-1', 'theme-4', 'theme-3', 'theme-2' ];
+            let currentThemeIndex = 0;
+            
+            // Загрузка сохранённой темы
+            function loadTheme() {
+                const savedTheme = localStorage.getItem('app-theme');
+           
+		if (savedTheme && themes.includes(savedTheme)) {
+                    document.body.classList.add(savedTheme);
+                    themes.forEach(theme => {
+                        if (theme !== savedTheme) document.body.classList.remove(theme);
+                    });
+                    currentThemeIndex = themes.indexOf(savedTheme);
+                } else {
+                    document.body.classList.add('theme-1');
+                }
+            }
+            
+	    function updateCircleColor() {
+	        if (currentMode === 'pomodoro') {
+        	progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--pomodoro-color').trim();
+    	    } else if (currentMode === 'short') {
+        	progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--short-color').trim();
+    	    } else {
+       		progressFill.style.stroke = getComputedStyle(document.body).getPropertyValue('--long-color').trim();
+    	    }
+	    }
+
+            // Смена темы
+            function switchTheme() {
+                // Убираем текущую тему
+                themes.forEach(theme => {
+                    document.body.classList.remove(theme);
+                });
+                
+                // Переключаем на следующую тему
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                const newTheme = themes[currentThemeIndex];
+                document.body.classList.add(newTheme);
+                
+                // Сохраняем выбранную тему
+                updateCircleColor();
+            }
+            
+            // Назначаем обработчик на кнопку
+            if (themeToggle) {
+                themeToggle.addEventListener('click', switchTheme);
+            }
+            
+            // Загружаем тему при старте
+            loadTheme();
+
+	    // ============ РАЗБЛОКИРОВКА ЗВУКОВ ДЛЯ ТЕЛЕФОНОВ ============
+	    function unlockAudio() {
+    	    // Создаём пустой аудиоконтекст (если его ещё нет)
+    		if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+	       	var context = new (window.AudioContext || window.webkitAudioContext)();
+	        // Создаём короткий звук (без звука)
+	        var buffer = context.createBuffer(1, 1, 22050);
+	        var source = context.createBufferSource();
+	        source.buffer = buffer;
+	        source.connect(context.destination);
+	        source.start(0);
+	        // Разрешаем контекст
+	        if (context.state === 'suspended') {
+	            context.resume();
+        }
+    }
+}
+
+// При первом клике по любому месту страницы — разблокируем аудио
+document.body.addEventListener('click', function() {
+    unlockAudio();
+}, { once: true });
+
+            
+            console.log;
+        });
+    </script>
+</body>
+</html>
